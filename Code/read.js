@@ -22,15 +22,18 @@ function searchPassword(password) {
   });
 
   const foundPassword = indexedPasswords.find(entry => entry.password === password);
-  if (foundPassword) {
-    console.log(`Password "${password}" found.`);
-    console.log(`MD5: ${foundPassword.hashes[0]}`);
-    console.log(`SHA1: ${foundPassword.hashes[1]}`);
-    console.log(`SHA256: ${foundPassword.hashes[2]}`);
-  } else {
-    console.log(`Password "${password}" not found. It has now been added to the database.`);
-    
-    addPasswords(password, 'fromUser')
+  
+  if (typeof readline !== 'undefined') {
+    if (foundPassword) {
+      console.log(`Password "${password}" found.`);
+      console.log(`MD5: ${foundPassword.hashes[0]}`);
+      console.log(`SHA1: ${foundPassword.hashes[1]}`);
+      console.log(`SHA256: ${foundPassword.hashes[2]}`);
+    } else {
+      console.log(`Password "${password}" not found. It has now been added to the database.`);
+      
+      addPasswords(password, 'fromUser')
+    }
   }
 }
 
