@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const startTime = process.hrtime();
 const indexedPasswords = [];
+
 const indexDirectory = path.join(__dirname, '../Index');
 const indexedFiles = fs.readdirSync(indexDirectory);
 
@@ -16,12 +18,11 @@ indexedFiles.forEach(folderName => {
     const lines = data.split('\n');
     lines.some(line => {
       const storedPassword = line.split('|')[0];
+
       indexedPasswords.push(storedPassword); 
     });
   });
 });
-// console.log(indexedPasswords)
-
 
 function indexPasswords(directory) {
   const files = fs.readdirSync(directory);
@@ -70,7 +71,6 @@ function indexPasswords(directory) {
       }
     });
 
-    // console.log('Finished reading: ' + filePath)
     const destinationPath = path.join(__dirname, '../Processed', file);    
     fs.renameSync(filePath, destinationPath);
   }); 
@@ -81,3 +81,12 @@ function hash(text, algorithm) {
 }
 
 indexPasswords(path.join(__dirname, '../Unprocessed-Passwords'));
+
+function calculateExecutionTime(startTime) {
+  const endTime = process.hrtime(startTime);
+  const executionTimeInSeconds = endTime[0] + endTime[1] / 1e9;
+  return executionTimeInSeconds.toFixed(2);
+}
+
+const executionTime = calculateExecutionTime(startTime);
+console.log(executionTime);
