@@ -35,45 +35,49 @@ function indexPasswords(directory) {
     lines.forEach(line => {
       const password = line.trim();
       
-      if (password && !indexedPasswords.includes(password)) { 
-        let firstChar = password.charAt(0).toLowerCase();           
-        
-        if (/[^^\w\d]/.test(firstChar)) {
-          firstChar = '@';
-        }
-        
-        const indexFolder = path.join(__dirname, '../Index', firstChar);
-
-        let index = 1;
-        let fileName = `${firstChar}-passwords${index}.txt`;
-        let indexFilePath = path.join(indexFolder, fileName);
-        
-        fs.mkdirSync(indexFolder, { recursive: true });
-        
-        while (fs.existsSync(indexFilePath)) {
-          const dataCurrent = fs.readFileSync(indexFilePath, 'utf8');
-          const linesCurrent = dataCurrent.split('\n');
-          const fileSizeInLines = linesCurrent.length;
-          
-          if (fileSizeInLines > 10000) {
-            index++;
-            indexFilePath = path.join(indexFolder, `${firstChar}-passwords${index}.txt`);
-          } else {
-            break;
-          }
-        }
-
-        const passwordEntry = `${password}|${hash(password, 'md5')}|${hash(password, 'sha1')}|${hash(password, 'sha256')}|${file}`;
-        fs.appendFileSync(indexFilePath, passwordEntry + '\n');         
-           
-        indexedPasswords.push(password)
-        
-      }
+      addPasswords(password, file)
     });
 
     const destinationPath = path.join(__dirname, '../Processed', file);    
     fs.renameSync(filePath, destinationPath);
   }); 
+}
+
+function addPasswords(password, file) {
+  if (password && !indexedPasswords.includes(password)) { 
+    let firstChar = password.charAt(0).toLowerCase();           
+    
+    if (/[^^\w\d]/.test(firstChar)) {
+      firstChar = '@';
+    }
+    
+    const indexFolder = path.join(__dirname, '../Index', firstChar);
+
+    let index = 1;
+    let fileName = `${firstChar}-passwords${index}.txt`;
+    let indexFilePath = path.join(indexFolder, fileName);
+    
+    fs.mkdirSync(indexFolder, { recursive: true });
+    
+    while (fs.existsSync(indexFilePath)) {
+      const dataCurrent = fs.readFileSync(indexFilePath, 'utf8');
+      const linesCurrent = dataCurrent.split('\n');
+      const fileSizeInLines = linesCurrent.length;
+      
+      if (fileSizeInLines > 10000) {
+        index++;
+        indexFilePath = path.join(indexFolder, `${firstChar}-passwords${index}.txt`);
+      } else {
+        break;
+      }
+    }
+
+    const passwordEntry = `${password}|${hash(password, 'md5')}|${hash(password, 'sha1')}|${hash(password, 'sha256')}|${file}`;
+    fs.appendFileSync(indexFilePath, passwordEntry + '\n');         
+       
+    indexedPasswords.push(password)
+    
+  }
 }
 
 function hash(text, algorithm) {
@@ -89,4 +93,6 @@ function calculateExecutionTime(startTime) {
 }
 
 const executionTime = calculateExecutionTime(startTime);
-console.log(executionTime);
+// console.log(executionTime);
+
+module.exports = addPasswords
