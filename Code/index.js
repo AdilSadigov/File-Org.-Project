@@ -80,11 +80,30 @@ function addPasswords(password, file) {
   }
 }
 
+function sortPasswordsInFolders() {
+  fs.readdirSync(indexDirectory).forEach(folderName => {
+    const folderPath = path.join(indexDirectory, folderName);
+    const files = fs.readdirSync(folderPath);
+
+    files.forEach(fileName => {
+      const filePath = path.join(folderPath, fileName);
+      const data = fs.readFileSync(filePath, 'utf8');
+      const lines = data.split('\n');
+      
+      const sortedLines = lines.filter(line => line.trim() !== '').sort();
+
+      fs.writeFileSync(filePath, sortedLines.join('\n'), 'utf8');
+    });
+  });
+}
+
 function hash(text, algorithm) {
   return crypto.createHash(algorithm).update(text).digest('hex');
 }
 
 indexPasswords(path.join(__dirname, '../Unprocessed-Passwords'));
+
+sortPasswordsInFolders();
 
 function calculateExecutionTime(startTime) {
   const endTime = process.hrtime(startTime);
