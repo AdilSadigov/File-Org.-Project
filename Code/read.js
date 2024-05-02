@@ -5,24 +5,29 @@ const addPasswords = require('./index');
 const indexDirectory = path.join(__dirname, '../Index');
 
 function searchPassword(password) {
-  const indexedPasswords = []
+  const firstLetter = password[0];
+  const folderPath = path.join(indexDirectory, firstLetter);
 
-  fs.readdirSync(indexDirectory).forEach(folderName => {
-    const folderPath = path.join(indexDirectory, folderName);
-    fs.readdirSync(folderPath).forEach(fileName => {
-      const filePath = path.join(folderPath, fileName);
-      const data = fs.readFileSync(filePath, 'utf8');
-      const lines = data.split('\n');
-      lines.forEach(line => {
-        const storedPassword = line.split('|')[0];
-        const hashValues = line.split('|').slice(1);
-        indexedPasswords.push({password: storedPassword, hashes: hashValues});
-      });
+  if (!fs.existsSync(folderPath)) {
+    console.log(`Password "${password}" not found. It has now been added to the database.`);      
+    addPasswords(password, 'fromUser')
+    return;
+  }
+
+  const indexedPasswords = [];
+  fs.readdirSync(folderPath).forEach(fileName => {
+    const filePath = path.join(folderPath, fileName);
+    const data = fs.readFileSync(filePath, 'utf8');
+    const lines = data.split('\n');
+    lines.forEach(line => {
+      const storedPassword = line.split('|')[0];
+      const hashValues = line.split('|').slice(1);
+      indexedPasswords.push({ password: storedPassword, hashes: hashValues });
     });
   });
 
   const foundPassword = indexedPasswords.find(entry => entry.password === password);
-  
+
   if (typeof readline !== 'undefined') {
     if (foundPassword) {
       console.log(`Password "${password}" found.`);
