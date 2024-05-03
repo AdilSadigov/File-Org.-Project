@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const addPasswords = require('./index');
+const {addPasswords, sortPasswordsInFolders} = require('./index');
 
 const indexDirectory = path.join(__dirname, '../Index');
 
@@ -11,9 +11,10 @@ function searchPassword(password) {
   if (!fs.existsSync(folderPath)) {
     console.log(`Password "${password}" not found. It has now been added to the database.`);      
     addPasswords(password, 'fromUser')
+    sortPasswordsInFolders()
     return;
   }
-
+  
   const indexedPasswords = [];
   fs.readdirSync(folderPath).forEach(fileName => {
     const filePath = path.join(folderPath, fileName);
@@ -25,9 +26,9 @@ function searchPassword(password) {
       indexedPasswords.push({ password: storedPassword, hashes: hashValues });
     });
   });
-
+  
   const foundPassword = indexedPasswords.find(entry => entry.password === password);
-
+  
   if (typeof readline !== 'undefined') {
     if (foundPassword) {
       console.log(`Password "${password}" found.`);
@@ -38,6 +39,7 @@ function searchPassword(password) {
       console.log(`Password "${password}" not found. It has now been added to the database.`);
       
       addPasswords(password, 'fromUser')
+      sortPasswordsInFolders()
     }
   }
 }

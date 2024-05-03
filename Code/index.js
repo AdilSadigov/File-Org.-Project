@@ -7,6 +7,7 @@ const indexedPasswords = [];
 
 const indexDirectory = path.join(__dirname, '../Index');
 const indexedFiles = fs.readdirSync(indexDirectory);
+let read = true
 
 indexedFiles.forEach(folderName => {
   const folderPath = path.join(indexDirectory, folderName);
@@ -24,6 +25,7 @@ indexedFiles.forEach(folderName => {
   });
 });
 
+
 function indexPasswords(directory) {
   const files = fs.readdirSync(directory);
   
@@ -37,7 +39,7 @@ function indexPasswords(directory) {
       
       addPasswords(password, file)
     });
-
+    
     const destinationPath = path.join(__dirname, '../Processed', file);    
     fs.renameSync(filePath, destinationPath);
   }); 
@@ -73,20 +75,20 @@ function addPasswords(password, file) {
     }
 
     const passwordEntry = `${password}|${hash(password, 'md5')}|${hash(password, 'sha1')}|${hash(password, 'sha256')}|${file}`;
-    fs.appendFileSync(indexFilePath, passwordEntry + '\n');         
-       
+    fs.appendFileSync(indexFilePath, passwordEntry + '\n');               
     indexedPasswords.push(password)
-    
+
+    read = false    
   }
 }
 
 function sortPasswordsInFolders() {
   fs.readdirSync(indexDirectory).forEach(folderName => {
-    const folderPath = path.join(indexDirectory, folderName);
-    const files = fs.readdirSync(folderPath);
+    const folderPathSort = path.join(indexDirectory, folderName);
+    const filesSort = fs.readdirSync(folderPathSort);
 
-    files.forEach(fileName => {
-      const filePath = path.join(folderPath, fileName);
+    filesSort.forEach(fileName => {
+      const filePath = path.join(folderPathSort, fileName);
       const data = fs.readFileSync(filePath, 'utf8');
       const lines = data.split('\n');
       
@@ -103,7 +105,9 @@ function hash(text, algorithm) {
 
 indexPasswords(path.join(__dirname, '../Unprocessed-Passwords'));
 
-sortPasswordsInFolders();
+if (read == false) {
+  sortPasswordsInFolders()
+}
 
 function calculateExecutionTime(startTime) {
   const endTime = process.hrtime(startTime);
@@ -114,4 +118,7 @@ function calculateExecutionTime(startTime) {
 const executionTime = calculateExecutionTime(startTime);
 // console.log(executionTime);
 
-module.exports = addPasswords
+module.exports = {
+  addPasswords,
+  sortPasswordsInFolders
+}
