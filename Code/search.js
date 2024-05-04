@@ -10,7 +10,7 @@ function searchPassword(password) {
 
   if (!fs.existsSync(folderPath)) {
     console.log(`Password "${password}" not found. It has now been added to the database.`);      
-    addPasswords(password, 'fromUser')
+    addPasswords(password, 'search')
     sortPasswordsInFolders()
     return;
   }
@@ -38,7 +38,7 @@ function searchPassword(password) {
     } else {
       console.log(`Password "${password}" not found. It has now been added to the database.`);
       
-      addPasswords(password, 'fromUser')
+      addPasswords(password, 'search')
       sortPasswordsInFolders()
     }
   }
