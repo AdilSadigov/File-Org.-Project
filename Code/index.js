@@ -7,7 +7,6 @@ const indexedPasswords = [];
 
 const indexDirectory = path.join(__dirname, '../Index');
 const indexedFiles = fs.readdirSync(indexDirectory);
-let read = true
 
 indexedFiles.forEach(folderName => {
   const folderPath = path.join(indexDirectory, folderName);
@@ -73,12 +72,10 @@ function addPasswords(password, file) {
         break;
       }
     }
-
+    
     const passwordEntry = `${password}|${hash(password, 'md5')}|${hash(password, 'sha1')}|${hash(password, 'sha256')}|${file}`;
     fs.appendFileSync(indexFilePath, passwordEntry + '\n');               
     indexedPasswords.push(password)
-
-    read = false    
   }
 }
 
@@ -93,8 +90,9 @@ function sortPasswordsInFolders() {
       const lines = data.split('\n');
       
       const sortedLines = lines.filter(line => line.trim() !== '').sort();
+      const sortedData = sortedLines.map(line => line + '\n').join('');
 
-      fs.writeFileSync(filePath, sortedLines.join('\n'), 'utf8');
+      fs.writeFileSync(filePath, sortedData, 'utf8');
     });
   });
 }
@@ -105,9 +103,8 @@ function hash(text, algorithm) {
 
 indexPasswords(path.join(__dirname, '../Unprocessed-Passwords'));
 
-if (read == false) {
-  sortPasswordsInFolders()
-}
+sortPasswordsInFolders()
+
 
 function calculateExecutionTime(startTime) {
   const endTime = process.hrtime(startTime);
