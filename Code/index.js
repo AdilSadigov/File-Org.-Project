@@ -116,7 +116,7 @@ function calculateExecutionTime(startTime) {
 }
 
 const executionTime = calculateExecutionTime(startTime);
-// console.log(executionTime);
+// console.log(`${indexedPasswords.length} passwords are indexed in ${executionTime} seconds`)
 
 module.exports = {
   addPasswords,
